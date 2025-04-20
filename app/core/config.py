@@ -54,8 +54,8 @@ class Settings(BaseSettings):
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
-    # CORS設定
-    CORS_ORIGINS_STR: str = Field(default="http://localhost:3000")
+    # CORS設定 - 環境変数から読み込むように修正
+    CORS_ORIGINS_STR: str = os.getenv("CORS_ORIGINS_STR", "http://localhost:3000")
     ALLOWED_HOSTS: list = ["*"]
 
     class Config:
@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     # プロパティとしてCORS_ORIGINSを実装
     @property
     def CORS_ORIGINS(self) -> List[str]:
+        # アスタリスクが含まれている場合は全てのオリジンを許可
+        if "*" in self.CORS_ORIGINS_STR:
+            return ["*"]
         return [origin.strip() for origin in self.CORS_ORIGINS_STR.split(",")]
     
     # データベースURLを動的に生成
