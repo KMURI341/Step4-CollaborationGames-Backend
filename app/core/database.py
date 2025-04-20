@@ -1,4 +1,5 @@
 # app/core/database.py
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -17,10 +18,17 @@ def get_db_connect_args() -> Dict[str, Any]:
     if settings.USE_AZURE:
         ssl_mode = settings.AZURE_MYSQL_SSL_MODE.lower()
         if ssl_mode == "require":
-            # SSL 証明書のパスを指定
-            connect_args["ssl"] = {
-                "ssl_ca": r"C:\Users\mmkji\.ssl\DigiCertGlobalRootCA.crt.pem"
-            }
+            # 環境変数から証明書の有無を確認し、デプロイ環境に応じて設定を変更
+            if os.path.exists("DigiCertGlobalRootCA.crt.pem"):
+                # 証明書ファイルがある場合
+                connect_args["ssl"] = {
+                    "ssl_ca": "DigiCertGlobalRootCA.crt.pem"
+                }
+            else:
+                # 証明書ファイルがない場合、SSL 検証をスキップ
+                connect_args["ssl"] = {
+                    "ssl_verify_cert": False
+                }
     elif "sqlite" in settings.SQLALCHEMY_DATABASE_URL:
         # SQLiteの場合は同時接続チェックをオフ
         connect_args["check_same_thread"] = False
