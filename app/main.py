@@ -48,7 +48,7 @@ app = FastAPI(
 # CORSミドルウェアの設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://tech0-gen-8-step4-bic-frontend.azurewebsites.net", "http://localhost:3000"],
+    allow_origins=["https://tech0-gen-8-step4-cbg-frontend.azurewebsites.net"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
